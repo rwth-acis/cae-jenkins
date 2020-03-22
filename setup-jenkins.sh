@@ -2,7 +2,7 @@
 
 USER=admin
 PASSWORD_FILE=$JENKINS_HOME/secrets/initialAdminPassword
-JENKINS_HOST="http://127.0.0.1:8082"
+JENKINS_HOST="http://127.0.0.1:8082/jenkins/"
 PASS=""
 
 create_job () {

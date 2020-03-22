@@ -17,6 +17,7 @@ check_if_exists "$WIDGET_HTTP_PORT" WIDGET_HTTP_PORT
 check_if_exists "$MICROSERVICE_PORT" MICROSERVICE_PORT
 check_if_exists "$JENKINS_URL" JENKINS_URL
 check_if_exists "$DEPLOYMENT_URL" DEPLOYMENT_URL
+check_if_exists "$JENKINS_PREFIX" JENKINS_PREFIX
 
 if [ "$ENV_VARIABLE_NOT_SET" = true ] ; then
     echo "Missing environment variables, exiting..."
@@ -26,4 +27,4 @@ fi
 ./setup-jenkins.sh &
 
 export JAVA_OPTS="-Dhudson.security.csrf.DefaultCrumbIssuer.EXCLUDE_SESSION_ID=true $JAVA_OPTS"
-/usr/local/bin/jenkins.sh
+/usr/local/bin/jenkins.sh --prefix=$JENKINS_PREFIX
