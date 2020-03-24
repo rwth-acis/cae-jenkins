@@ -18,11 +18,20 @@ check_if_exists "$MICROSERVICE_PORT" MICROSERVICE_PORT
 check_if_exists "$JENKINS_URL" JENKINS_URL
 check_if_exists "$DEPLOYMENT_URL" DEPLOYMENT_URL
 check_if_exists "$JENKINS_PREFIX" JENKINS_PREFIX
+check_if_exists "$HOST_IP" HOST_IP
 
 if [ "$ENV_VARIABLE_NOT_SET" = true ] ; then
     echo "Missing environment variables, exiting..."
     exit 1
 fi
+
+
+##### Nginx ####
+cp /var/cae/nginx.conf /etc/nginx/conf.d/default.conf
+sed -i "s=<host_ip>=$HOST_IP=g" /etc/nginx/conf.d/default.conf
+sed -i "s=<widget_http_port>=$WIDGET_HTTP_PORT=g" /etc/nginx/conf.d/default.conf
+sed -i "s=<microservice_webconnector_port>=$MICROSERVICE_WEBCONNECTOR_PORT=g" /etc/nginx/conf.d/default.conf
+/etc/init.d/nginx start
 
 ./setup-jenkins.sh &
 

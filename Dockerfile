@@ -10,7 +10,7 @@ ENV JENKINS_PREFIX /
 
 USER root
 RUN apt-get update && \
-	apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common && \
+	apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common nginx && \
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
 	add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" && \
 	apt-get update && \
@@ -24,6 +24,7 @@ WORKDIR /var/cae
 COPY jobs ./jobs
 COPY docker-entrypoint.sh .
 COPY setup-jenkins.sh .
+COPY nginx.conf .
 
 ENTRYPOINT []
 CMD ["./docker-entrypoint.sh"]
