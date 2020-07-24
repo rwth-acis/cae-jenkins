@@ -37,7 +37,9 @@
   <builders>
     <hudson.tasks.Shell>
       <command>for dir in microservice-*/ ; do
-    (cd $dir &amp;&amp; ant clean_before_build generate_configs clean_after_build)
+    if [ -d "$dir" ]; then
+        (cd $dir &amp;&amp; ant clean_before_build generate_configs clean_after_build)
+    fi
 done</command>
     </hudson.tasks.Shell>
   </builders>
