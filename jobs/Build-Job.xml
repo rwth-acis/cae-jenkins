@@ -36,7 +36,18 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>for dir in microservice-*/ ; do
+      <command>if [ -f "get_ext_dependencies.sh" ]; then
+    chmod +x get_ext_dependencies.sh
+    ./get_ext_dependencies.sh
+fi
+    
+for dir in microservice-*/ ; do
+    if [ -d "$dir" ]; then
+        (cd $dir &amp;&amp; ant clean_before_build generate_configs clean_after_build)
+    fi
+done
+
+for dir in dependencies/*; do
     if [ -d "$dir" ]; then
         (cd $dir &amp;&amp; ant clean_before_build generate_configs clean_after_build)
     fi
@@ -45,7 +56,7 @@ done</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>microservice-*/service/,microservice-*/lib/,microservice-*/etc/,microservice-*/db/,frontendComponent-*/</artifacts>
+      <artifacts>microservice-*/service/,microservice-*/lib/,microservice-*/etc/,microservice-*/db/,frontendComponent-*/,dependencies/</artifacts>
       <allowEmptyArchive>false</allowEmptyArchive>
       <onlyIfSuccessful>false</onlyIfSuccessful>
       <fingerprint>false</fingerprint>
