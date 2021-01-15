@@ -36,7 +36,7 @@ Also, if some CAE created application is deployed through CAE-Jenkins instance, 
 **Attention**: [CAE Code Generation Service][cae-code-generation-service] is triggering build job of Jenkins. In order to that, Jenkins instance need to be made anonymously readable. In order to that, login to Jenkins as admin using initialAdminPassword. After, enable `Allow anonymous read access` under following path: `Manage Jenkins` > `Configure Global Security` > `Authorization` 
 
 Following environment variables are needed to be passed to container during initialization:
-* `JENKINS_URL`: Url address of currently running container
+* `URL_JENKINS`: Url address of currently running container
 * `DEPLOYMENT_URL`: Url address of application which will be deployed by CAE Jenkins. Since CAE Jenkins instance and deployment container which is started by CAE Jenkins instance will run on same server, they will have same root url adddress. However, they can have different relative path if they are behind reverse proxy. Therefore, two separate environment variable is used.
 * `HOST_IP`: IP of host machine which CAE Jenkins Docker container is running. It is used to add reverse proxy to deployed application.
 

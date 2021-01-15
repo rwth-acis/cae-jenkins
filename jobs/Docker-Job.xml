@@ -17,7 +17,7 @@
       <command>docker ps | grep <cae-deployment-docker-image> | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker stop
 docker ps -a | grep <cae-deployment-docker-image> | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker rm
 docker pull <cae-deployment-docker-image>
-docker run -p $MICROSERVICE_WEBCONNECTOR_PORT:$MICROSERVICE_WEBCONNECTOR_PORT -p $WIDGET_HTTP_PORT:$WIDGET_HTTP_PORT -e JENKINS_URL=$JENKINS_URL -e BUILD_JOB_NAME=Build-Job -e DOCKER_URL=$DEPLOYMENT_URL -e MICROSERVICE_WEBCONNECTOR_PORT=$MICROSERVICE_WEBCONNECTOR_PORT -e MICROSERVICE_PORT=$MICROSERVICE_PORT -e HTTP_PORT=$WIDGET_HTTP_PORT  -d <cae-deployment-docker-image>
+docker run -p $MICROSERVICE_WEBCONNECTOR_PORT:$MICROSERVICE_WEBCONNECTOR_PORT -p $WIDGET_HTTP_PORT:$WIDGET_HTTP_PORT -e JENKINS_URL=$URL_JENKINS -e BUILD_JOB_NAME=Build-Job -e DOCKER_URL=$DEPLOYMENT_URL -e MICROSERVICE_WEBCONNECTOR_PORT=$MICROSERVICE_WEBCONNECTOR_PORT -e MICROSERVICE_PORT=$MICROSERVICE_PORT -e HTTP_PORT=$WIDGET_HTTP_PORT  -d <cae-deployment-docker-image>
 </command>
     </hudson.tasks.Shell>
   </builders>
