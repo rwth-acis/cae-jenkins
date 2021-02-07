@@ -26,5 +26,7 @@ COPY docker-entrypoint.sh .
 COPY setup-jenkins.sh .
 COPY nginx.conf .
 
+RUN jenkins-plugin-cli --plugins parameterized-trigger:2.40
+
 ENTRYPOINT []
 CMD ["./docker-entrypoint.sh"]

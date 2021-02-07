@@ -19,4 +19,3 @@ mailer:1.29
 credentials:2.3.0
 git-client:3.0.0
 trilead-api:1.0.5
-parameterized-trigger:2.40
