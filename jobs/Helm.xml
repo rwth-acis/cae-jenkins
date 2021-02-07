@@ -12,7 +12,7 @@
         <hudson.model.StringParameterDefinition>
           <name>NAME</name>
           <description></description>
-          <defaultValue></defaultValue>
+          <defaultValue>TESTNAMEFILE</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -28,38 +28,63 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command># Use this job to build the docker image and push it to a image repository 
+      <command>#!/bin/bash
+# Use this job to build helm package for application and push to helm repository and deploy application to cluster
 # Install for json data operations
 sudo apt-get --assume-yes install jq
 # Get the passed body information of post request from frontend for application metainfo
 TEST=$(echo $NAME | jq -r &apos;.name&apos;) 
-rm -rf caedepltest
-docker ps | grep rwthacis/cae-deployment | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker stop
-docker ps -a | grep rwthacis/cae-deployment | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker rm
-docker pull rwthacis/cae-deployment
-# CAE Deployment Docker container is used to run CAE created application. It fetches latest artifact from given CAE Jenkins instance and run it. 
-git clone https://git.rwth-aachen.de/jungerjunge2/caedepltest.git
-cd caedepltest
-docker login --username erdzan12 --password bebwe7-qemhem-sebhAt
-docker build -t $TEST:v1 ./
-# Push image to repo
-docker tag $TEST:v1 erdzan12/$TEST:v1
-docker push erdzan12/$TEST:v1</command>
+echo $TEST
+rm -rf *
+# Install helm
+curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+sudo apt-get install apt-transport-https --yes
+echo &quot;deb https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update
+sudo apt-get install helm
+# Get template helm chart
+git clone https://git.rwth-aachen.de/jungerjunge2/helm-temp.git
+# setup helm chart with user information
+mv ./helm-temp ./$TEST
+sed -i -e &quot;s={NAME}=$TEST=g&quot; ./$TEST/values.yaml
+sed -i -e &quot;s={NAME}=$TEST=g&quot; ./$TEST/Chart.yaml
+helm package ./$TEST
+# Push helm chart to repo
+curl --data-binary &quot;@$TEST-0.1.0.tgz&quot; http://172.16.95.5:30007/api/charts
+# Update helm repo in helm-wrapper
+curl -X PUT http://172.16.95.5:30008/api/repositories
+
+# Send request to helm-wrapper to deploy application
+response_id=$(curl -X POST http://172.16.95.5:30008/api/namespaces/foo/releases/$TEST?chart=mymus/$TEST)
+CODE=$(echo $response_id | jq -r &apos;.code&apos;) 
+echo $response_id
+echo response_id
+echo $CODE
+# Check if errors happened during deployment
+if [ $CODE == 0 ]
+then
+echo test
+  echo trklmtrlk
+  echo $CODE
+  curl --header &quot;Content-Type: application/json&quot; \
+    --request POST \
+    --data &quot;$NAME&quot; \
+    http://host.docker.internal:8081/CAE/updateDeployStatus/DEPLOYED
+else
+echo dfdfdfdfd
+  echo 22222222d
+  echo $CODE
+   exit 42
+fi
+
+
+</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.39">
       <configs>
-        <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
-          <configs>
-            <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
-          </configs>
-          <projects>Helm</projects>
-          <condition>SUCCESS</condition>
-          <triggerWithNoParameters>false</triggerWithNoParameters>
-          <triggerFromChildProjects>false</triggerFromChildProjects>
-        </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
         <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
           <configs>
             <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
