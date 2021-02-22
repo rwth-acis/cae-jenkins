@@ -50,3 +50,4 @@ create_job "Build-Job" $CRUMB
 create_job "Docker-Job" $CRUMB
 create_job "DEPLOY_FAILURE" $CRUMB
 create_job "Helm" $CRUMB
+create_job "L2PAnnounce" $CRUMB

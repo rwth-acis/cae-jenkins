@@ -4,9 +4,6 @@
   <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty plugin="naginator@1.18.1">
-      <optOut>false</optOut>
-    </com.chikli.hudson.plugin.naginator.NaginatorOptOutProperty>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
@@ -33,6 +30,7 @@
 # Install for json data operations
 sudo apt-get --assume-yes install jq
 # Get the passed body information of post request from frontend for application metainfo
+
 TEST=$(echo $NAME | jq -r &apos;.name&apos;) 
 echo $TEST
 rm -rf *
@@ -50,12 +48,12 @@ sed -i -e &quot;s={NAME}=$TEST=g&quot; ./$TEST/values.yaml
 sed -i -e &quot;s={NAME}=$TEST=g&quot; ./$TEST/Chart.yaml
 helm package ./$TEST
 # Push helm chart to repo
-curl --data-binary &quot;@$TEST-0.1.0.tgz&quot; http://172.16.95.5:30007/api/charts
+curl --data-binary &quot;@$TEST-0.1.0.tgz&quot; http://192.168.178.90:30007/api/charts
 # Update helm repo in helm-wrapper
-curl -X PUT http://172.16.95.5:30008/api/repositories
+curl -X PUT http://192.168.178.90:30008/api/repositories
 
 # Send request to helm-wrapper to deploy application
-response_id=$(curl -X POST http://172.16.95.5:30008/api/namespaces/foo/releases/$TEST?chart=mymus/$TEST)
+response_id=$(curl -X POST http://192.168.178.90:30008/api/namespaces/foo/releases/$TEST?chart=mymus/$TEST)
 CODE=$(echo $response_id | jq -r &apos;.code&apos;) 
 echo $response_id
 echo response_id
@@ -66,10 +64,13 @@ then
 echo test
   echo trklmtrlk
   echo $CODE
+  NEWONE=$(echo $NAME | jq &apos;.statusUpdate = &quot;DEPLOYED&quot;&apos;) 
+  echo &quot;OOKKKKK&quot;
+  echo $NEWONE
   curl --header &quot;Content-Type: application/json&quot; \
     --request POST \
-    --data &quot;$NAME&quot; \
-    http://host.docker.internal:8081/CAE/updateDeployStatus/DEPLOYED
+    --data &quot;$NEWONE&quot; \
+    http://host.docker.internal:8081/CAE/updateDeployStatus
 else
 echo dfdfdfdfd
   echo 22222222d
@@ -83,7 +84,7 @@ fi
     </hudson.tasks.Shell>
   </builders>
   <publishers>
-    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.39">
+    <hudson.plugins.parameterizedtrigger.BuildTrigger plugin="parameterized-trigger@2.40">
       <configs>
         <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
           <configs>
@@ -91,6 +92,15 @@ fi
           </configs>
           <projects>DEPLOY_FAILURE</projects>
           <condition>FAILED</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+          <triggerFromChildProjects>false</triggerFromChildProjects>
+        </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+        <hudson.plugins.parameterizedtrigger.BuildTriggerConfig>
+          <configs>
+            <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
+          </configs>
+          <projects>L2PAnnounce</projects>
+          <condition>SUCCESS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
           <triggerFromChildProjects>false</triggerFromChildProjects>
         </hudson.plugins.parameterizedtrigger.BuildTriggerConfig>

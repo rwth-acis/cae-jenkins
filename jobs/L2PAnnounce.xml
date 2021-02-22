@@ -20,17 +20,16 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <authToken>1475f18c-561d-4c6b-8ffa-4d3ed65d96ea</authToken>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>NEWONE=$(echo $NAME | jq &apos;.statusUpdate = &quot;NOT DEPLOYED&quot;&apos;) 
-echo &quot;OOKKKKK&quot;
-echo $NEWONE
-curl --header &quot;Content-Type: application/json&quot; \
-  --request POST \
-  --data &quot;$NEWONE&quot; \
-  http://host.docker.internal:8081/CAE/updateDeployStatus</command>
+      <command>AUTHHEADER=$(echo $NAME | jq -r &apos;.Authorization&apos;) 
+echo $AUTHHEADER
+
+curl -H &quot;Authorization: Basic $AUTHHEADER&quot; -X POST  http://host.docker.internal:8012/las2peer/services/testCAE -d &quot;$NAME&quot;
+</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>
