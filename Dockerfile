@@ -19,6 +19,7 @@ RUN apt-get update && \
 WORKDIR /var/jenkins_home
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+COPY setup_java_14.groovy /var/jenkins_home/init.groovy.d/setup_java_14.groovy
 
 WORKDIR /var/cae
 COPY jobs ./jobs
