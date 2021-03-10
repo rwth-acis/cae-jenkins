@@ -39,7 +39,27 @@ replace_placeholders () {
     sed -i "s=<jenkins-job-token>=$JENKINS_JOB_TOKEN=g" jobs/Build-Job.xml    
     sed -i "s=<jenkins-job-token>=$JENKINS_JOB_TOKEN=g" jobs/Docker-Job.xml    
     sed -i "s=<jenkins-job-token>=$JENKINS_JOB_TOKEN=g" jobs/Docker-Job.xml    
-    sed -i "s=<cae-deployment-docker-image>=$CAE_DEPLOYMENT_DOCKER_IMAGE=g" jobs/Docker-Job.xml    
+    sed -i "s=<cae-deployment-docker-image>=$CAE_DEPLOYMENT_DOCKER_IMAGE=g" jobs/Docker-Job.xml   
+
+    sed -i "s=<docker-hub-login>=$DOCKER_HUB_LOGIN=g" jobs/Docker-Job.xml    
+    sed -i "s=<docker-hub-password>=$DOCKER_HUB_PASSWORD=g" jobs/Docker-Job.xml    
+
+    sed -i "s=<las2peer-registry-url>=$LAS2PEER_REGISTRY_URL=g" jobs/AnnounceCAERelease.xml    
+    sed -i "s=<las2peer-registry-url>=$LAS2PEER_REGISTRY_URL=g" jobs/AnnounceCAEDeployment.xml    
+    sed -i "s=<las2peer-registry-url>=$LAS2PEER_REGISTRY_URL=g" jobs/AnnounceCAEUndeployment.xml    
+
+    sed -i "s=<cae-helm-cahrt-template>=$CAE_HELM_CHART_TEMPLATE=g" jobs/DeployToCluster.xml    
+    sed -i "s=<cluster-helm-url>=$CLUSTER_HELM_URL=g" jobs/DeployToCluster.xml    
+    sed -i "s=<cluster-repo-url>=$CLUSTER_REPO_URL=g" jobs/DeployToCluster.xml    
+
+    sed -i "s=<cluster-helm-url>=$CLUSTER_HELM_URL=g" jobs/UndeployFromCluster.xml    
+
+   
+  
+
+    
+
+    
 }
 
 check_password_file

@@ -31,17 +31,17 @@ sudo apt-get --assume-yes install jq
 # Get the passed body information of post request from frontend for application metainfo
 RELEASENAME=$(echo $BODY | jq -r &apos;.name&apos;) 
 rm -rf caedepltest
-docker ps | grep rwthacis/cae-deployment | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker stop
-docker ps -a | grep rwthacis/cae-deployment | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker rm
-docker pull rwthacis/cae-deployment
+docker ps | grep <cae-deployment-docker-image> | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker stop
+docker ps -a | grep <cae-deployment-docker-image> | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker rm
+docker pull <cae-deployment-docker-image>
 # CAE Deployment Docker container is used to run CAE created application. It fetches latest artifact from given CAE Jenkins instance and run it. 
 git clone https://git.rwth-aachen.de/jungerjunge2/caedepltest.git
 cd caedepltest
-docker login --username erdzan12 --password bebwe7-qemhem-sebhAt
+docker login --username <docker-hub-login> --password <docker-hub-password>
 docker build -t $RELEASENAME:v1 ./
 # Push image to repo
-docker tag $RELEASENAME:v1 erdzan12/$RELEASENAME:v1
-docker push erdzan12/$RELEASENAME:v1</command>
+docker tag $RELEASENAME:v1 <docker-hub-login>/$RELEASENAME:v1
+docker push <docker-hub-login>/$RELEASENAME:v1</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.4.1">

@@ -31,7 +31,7 @@ sudo apt-get --assume-yes install jq
 AUTHHEADER=$(echo $BODY | jq -r &apos;.Authorization&apos;) 
 echo $AUTHHEADER
 
-curl -H &quot;Authorization: Basic $AUTHHEADER&quot; -X POST http://host.docker.internal:8012/las2peer/services/registerClusterService -d $BODY</command>
+curl -H &quot;Authorization: Basic $AUTHHEADER&quot; -X POST <las2peer-registry-url>/las2peer/services/registerClusterService -d $BODY</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>

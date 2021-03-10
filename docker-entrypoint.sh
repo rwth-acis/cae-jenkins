@@ -20,6 +20,13 @@ check_if_exists "$DEPLOYMENT_URL" DEPLOYMENT_URL
 check_if_exists "$JENKINS_PREFIX" JENKINS_PREFIX
 check_if_exists "$HOST_IP" HOST_IP
 
+check_if_exists "$DOCKER_HUB_LOGIN" DOCKER_HUB_LOGIN
+check_if_exists "$DOCKER_HUB_PASSWORD" DOCKER_HUB_PASSWORD
+check_if_exists "$LAS2PEER_REGISTRY_URL" LAS2PEER_REGISTRY_URL
+check_if_exists "$CLUSTER_HELM_URL" CLUSTER_HELM_URL
+check_if_exists "$CLUSTER_REPO_URL" CLUSTER_REPO_URL
+check_if_exists "$CAE_HELM_CHART_TEMPLATE" CAE_HELM_CHART_TEMPLATE
+
 if [ "$ENV_VARIABLE_NOT_SET" = true ] ; then
     echo "Missing environment variables, exiting..."
     exit 1

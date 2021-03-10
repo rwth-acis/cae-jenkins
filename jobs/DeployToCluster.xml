@@ -40,7 +40,7 @@ echo &quot;deb https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo te
 sudo apt-get update
 sudo apt-get install helm
 # Get template helm chart
-git clone https://git.rwth-aachen.de/jungerjunge2/helm-temp.git
+git clone <cae-helm-cahrt-template>
 # setup helm chart with user information
 mv ./helm-temp ./$CLUSTERNAME
 sed -i -e &quot;s={NAME}=$CLUSTERNAME=g&quot; ./$CLUSTERNAME/values.yaml
@@ -48,12 +48,12 @@ sed -i -e &quot;s={IMAGENAME}=$RELEASENAME=g&quot; ./$CLUSTERNAME/values.yaml
 sed -i -e &quot;s={NAME}=$CLUSTERNAME=g&quot; ./$CLUSTERNAME/Chart.yaml
 helm package ./$CLUSTERNAME
 # Push helm chart to repo
-curl --data-binary &quot;@$CLUSTERNAME-0.1.0.tgz&quot; http://192.168.178.90:30007/api/charts
+curl --data-binary &quot;@$CLUSTERNAME-0.1.0.tgz&quot; <cluster-repo-url>/api/charts
 # Update helm repo in helm-wrapper
-curl -X PUT http://192.168.178.90:30008/api/repositories
+curl -X PUT <cluster-helm-url>/api/repositories
 
 # Send request to helm-wrapper to deploy application
-DEPLYMENT_RESPONSE=$(curl -X POST http://192.168.178.90:30008/api/namespaces/foo/releases/$CLUSTERNAME?chart=mymus/$CLUSTERNAME)
+DEPLYMENT_RESPONSE=$(curl -X POST <cluster-helm-url>/api/namespaces/foo/releases/$CLUSTERNAME?chart=mymus/$CLUSTERNAME)
 DEPLYMENT_RESPONSE_CODE=$(echo $DEPLYMENT_RESPONSE | jq -r &apos;.code&apos;) 
 echo $DEPLYMENT_RESPONSE_CODE
 # Check if errors happened during deployment

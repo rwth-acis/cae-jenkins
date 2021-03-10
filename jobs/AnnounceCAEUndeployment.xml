@@ -28,7 +28,7 @@
 sudo apt-get --assume-yes install jq
 # Get the passed body information of post request from frontend for application metainfo
 
-UNDEPLOYMENT_ANNOUNCE_RESPONSE=$(curl -X POST http://host.docker.internal:8012/las2peer/services/announceUndeployment -d &quot;$BODY&quot;)
+UNDEPLOYMENT_ANNOUNCE_RESPONSE=$(curl -X POST <las2peer-registry-url>/las2peer/services/announceUndeployment -d &quot;$BODY&quot;)
 UNDEPLOYMENT_ANNOUNCE_RESPONSE_CODE=$(echo $UNDEPLOYMENT_ANNOUNCE_RESPONSE | jq -r &apos;.code&apos;) 
 echo $UNDEPLOYMENT_ANNOUNCE_RESPONSE
 echo $UNDEPLOYMENT_ANNOUNCE_RESPONSE_CODE</command>
