@@ -7,8 +7,8 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.StringParameterDefinition>
-          <name>NAME</name>
-          <description></description>
+          <name>BODY</name>
+          <description>Body passed via POST request, containing information like, of release which should be used to deploy and name of deployment on cluster, as name should be unique, same name as release cannot be used, link is also sent used for ingress.</description>
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
@@ -20,16 +20,18 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <authToken>1475f18c-561d-4c6b-8ffa-4d3ed65d96ea</authToken>
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>AUTHHEADER=$(echo $NAME | jq -r &apos;.Authorization&apos;) 
+      <command>#!/bin/bash
+# Install for json data operations
+sudo apt-get --assume-yes install jq
+
+AUTHHEADER=$(echo $BODY | jq -r &apos;.Authorization&apos;) 
 echo $AUTHHEADER
 
-curl -H &quot;Authorization: Basic $AUTHHEADER&quot; -X POST  http://host.docker.internal:8012/las2peer/services/testCAE -d &quot;$NAME&quot;
-</command>
+curl -H &quot;Authorization: Basic $AUTHHEADER&quot; -X POST http://host.docker.internal:8012/las2peer/services/registerClusterService -d $BODY</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>

@@ -48,6 +48,13 @@ replace_placeholders
 get_crumb
 create_job "Build-Job" $CRUMB
 create_job "Docker-Job" $CRUMB
+create_job "DeployToCluster" $CRUMB
+create_job "UndeployFromCluster" $CRUMB
+create_job "AnnounceCAERelease" $CRUMB
+create_job "AnnounceCAEDeployment" $CRUMB
+create_job "AnnounceCAEUndeployment" $CRUMB
+create_job "ReleaseFailure" $CRUMB
 create_job "DEPLOY_FAILURE" $CRUMB
-create_job "Helm" $CRUMB
-create_job "L2PAnnounce" $CRUMB
+
+
+

@@ -15,24 +15,7 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@4.6.0">
-    <configVersion>2</configVersion>
-    <userRemoteConfigs>
-      <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/CAETESTRWTH/CAE-Deployment-Temp</url>
-      </hudson.plugins.git.UserRemoteConfig>
-    </userRemoteConfigs>
-    <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
-      </hudson.plugins.git.BranchSpec>
-    </branches>
-    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
-    <submoduleCfg class="empty-list"/>
-    <extensions>
-      <hudson.plugins.git.extensions.impl.WipeWorkspace/>
-    </extensions>
-  </scm>
+  <scm class="hudson.scm.NullSCM"/>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -42,22 +25,16 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>if [ -f &quot;get_ext_dependencies.sh&quot; ]; then
-    chmod +x get_ext_dependencies.sh
-    ./get_ext_dependencies.sh
-fi
-    
-for dir in microservice-*/ ; do
-    if [ -d &quot;$dir&quot; ]; then
-        (cd $dir &amp;&amp; ant clean_before_build generate_configs clean_after_build)
-    fi
-done
+      <command># Install for json data operations
+sudo apt-get --assume-yes install jq
+# Get the passed body information of post request from frontend for application metainfo
 
-for dir in dependencies/microservices/*; do
-    if [ -d &quot;$dir&quot; ]; then
-        (cd $dir &amp;&amp; ant clean_before_build generate_configs clean_after_build)
-    fi
-done</command>
+CLUSTER_NAME=$(echo $BODY | jq -r &apos;.clusterName&apos;) 
+echo $CLUSTER_NAME
+UNDEPLOYMENT_RESPONSE=$(curl -X DELETE http://192.168.178.90:30008/api/namespaces/foo/releases/$CLUSTER_NAME)
+UNDEPLOYMENT_RESPONSE_CODE=$(echo $UNDEPLOYMENT_RESPONSE | jq -r &apos;.code&apos;) 
+echo $UNDEPLOYMENT_RESPONSE
+echo $UNDEPLOYMENT_RESPONSE_CODE</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.4.1">
@@ -81,7 +58,7 @@ done</command>
             <configs>
               <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
             </configs>
-            <projects>Docker-Job</projects>
+            <projects>AnnounceCAEUndeployment</projects>
             <condition>ALWAYS</condition>
             <triggerWithNoParameters>false</triggerWithNoParameters>
             <triggerFromChildProjects>false</triggerFromChildProjects>
@@ -112,16 +89,6 @@ done</command>
       <runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.5"/>
     </org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
   </builders>
-  <publishers>
-    <hudson.tasks.ArtifactArchiver>
-      <artifacts>microservice-*/service/,microservice-*/lib/,microservice-*/etc/,microservice-*/db/,frontendComponent-*/,dependencies/</artifacts>
-      <allowEmptyArchive>false</allowEmptyArchive>
-      <onlyIfSuccessful>false</onlyIfSuccessful>
-      <fingerprint>false</fingerprint>
-      <defaultExcludes>true</defaultExcludes>
-      <caseSensitive>true</caseSensitive>
-      <followSymlinks>true</followSymlinks>
-    </hudson.tasks.ArtifactArchiver>
-  </publishers>
+  <publishers/>
   <buildWrappers/>
 </project>
