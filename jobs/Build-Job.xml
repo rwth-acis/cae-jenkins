@@ -42,7 +42,13 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>if [ -f &quot;get_ext_dependencies.sh&quot; ]; then
+      <command># Install zip for archiving build folders
+sudo apt install zip
+
+# Get the passed body information of post request from frontend for application metainfo
+RELEASENAME=$(echo $BODY | jq -r &apos;.name&apos;) 
+
+if [ -f &quot;get_ext_dependencies.sh&quot; ]; then
     chmod +x get_ext_dependencies.sh
     ./get_ext_dependencies.sh
 fi
@@ -57,7 +63,41 @@ for dir in dependencies/microservices/*; do
     if [ -d &quot;$dir&quot; ]; then
         (cd $dir &amp;&amp; ant clean_before_build generate_configs clean_after_build)
     fi
-done</command>
+done
+rm -rf $RELEASENAME
+mkdir $RELEASENAME
+
+if ls frontendComponent-* 1&gt; /dev/null 2&gt;&amp;1; then
+    cp -r ./frontendComponent-* ./$RELEASENAME
+else
+    echo &quot;frontendComponent files do not exist&quot;
+fi
+if ls microservice-* 1&gt; /dev/null 2&gt;&amp;1; then
+    cp -r ./microservice-* ./$RELEASENAME
+else
+    echo &quot;microservice files do not exist&quot;
+fi
+
+
+zip -r archive.zip $RELEASENAME
+
+# Use this job to build the docker image and push it to a image repository 
+# Install for json data operations
+sudo apt-get --assume-yes install jq
+# Get the passed body information of post request from frontend for application metainfo
+RELEASENAME=$(echo $BODY | jq -r &apos;.name&apos;) 
+rm -rf caedepltest
+docker ps | grep <cae-deployment-docker-image> | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker stop
+docker ps -a | grep <cae-deployment-docker-image> | grep -o &quot;^[a-z0-9]*&quot; | xargs --no-run-if-empty docker rm
+docker pull <cae-deployment-docker-image>
+# CAE Deployment Docker container is used to run CAE created application. It fetches latest artifact from given CAE Jenkins instance and run it. 
+git clone https://git.rwth-aachen.de/jungerjunge2/caedepltest.git
+cd caedepltest
+docker login --username <docker-hub-login> --password <docker-hub-password>
+docker build -t $RELEASENAME:v1 ./
+# Push image to repo
+docker tag $RELEASENAME:v1 <docker-hub-login>/$RELEASENAME:v1
+docker push <docker-hub-login>/$RELEASENAME:v1</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.4.1">
@@ -81,7 +121,7 @@ done</command>
             <configs>
               <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
             </configs>
-            <projects>Docker-Job</projects>
+            <projects>AnnounceCAERelease</projects>
             <condition>ALWAYS</condition>
             <triggerWithNoParameters>false</triggerWithNoParameters>
             <triggerFromChildProjects>false</triggerFromChildProjects>
@@ -112,16 +152,6 @@ done</command>
       <runner class="org.jenkins_ci.plugins.run_condition.BuildStepRunner$Fail" plugin="run-condition@1.5"/>
     </org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder>
   </builders>
-  <publishers>
-    <hudson.tasks.ArtifactArchiver>
-      <artifacts>microservice-*/service/,microservice-*/lib/,microservice-*/etc/,microservice-*/db/,frontendComponent-*/,dependencies/</artifacts>
-      <allowEmptyArchive>false</allowEmptyArchive>
-      <onlyIfSuccessful>false</onlyIfSuccessful>
-      <fingerprint>false</fingerprint>
-      <defaultExcludes>true</defaultExcludes>
-      <caseSensitive>true</caseSensitive>
-      <followSymlinks>true</followSymlinks>
-    </hudson.tasks.ArtifactArchiver>
-  </publishers>
+  <publishers/>
   <buildWrappers/>
 </project>
