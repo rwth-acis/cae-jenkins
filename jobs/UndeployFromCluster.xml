@@ -31,7 +31,7 @@ sudo apt-get --assume-yes install jq
 
 CLUSTER_NAME=$(echo $BODY | jq -r &apos;.clusterName&apos;) 
 echo $CLUSTER_NAME
-UNDEPLOYMENT_RESPONSE=$(curl -X DELETE <cluster-helm-url>/api/namespaces/foo/releases/$CLUSTER_NAME)
+UNDEPLOYMENT_RESPONSE=$(curl -v --http1.1 -X DELETE <cluster-helm-url>/api/namespaces/foo/releases/$CLUSTER_NAME)
 UNDEPLOYMENT_RESPONSE_CODE=$(echo $UNDEPLOYMENT_RESPONSE | jq -r &apos;.code&apos;) 
 echo $UNDEPLOYMENT_RESPONSE
 echo $UNDEPLOYMENT_RESPONSE_CODE</command>

@@ -34,7 +34,7 @@ CLUSTERNAME=$(echo $BODY | jq -r &apos;.clusterName&apos;)
 
 rm -rf *
 # Install helm
-curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+curl -v --http1.1 https://baltocdn.com/helm/signing.asc | sudo apt-key add -
 sudo apt-get install apt-transport-https --yes
 echo &quot;deb https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 sudo apt-get update
@@ -48,12 +48,12 @@ sed -i -e &quot;s={IMAGENAME}=$RELEASENAME=g&quot; ./$CLUSTERNAME/values.yaml
 sed -i -e &quot;s={NAME}=$CLUSTERNAME=g&quot; ./$CLUSTERNAME/Chart.yaml
 helm package ./$CLUSTERNAME
 # Push helm chart to repo
-curl --data-binary &quot;@$CLUSTERNAME-0.1.0.tgz&quot; <cluster-repo-url>/api/charts
+curl -v --http1.1 --data-binary &quot;@$CLUSTERNAME-0.1.0.tgz&quot; <cluster-repo-url>/api/charts
 # Update helm repo in helm-wrapper
-curl -X PUT <cluster-helm-url>/api/repositories
+curl -v --http1.1 -X PUT <cluster-helm-url>/api/repositories
 
 # Send request to helm-wrapper to deploy application
-DEPLYMENT_RESPONSE=$(curl -X POST <cluster-helm-url>/api/namespaces/foo/releases/$CLUSTERNAME?chart=mymus/$CLUSTERNAME)
+DEPLYMENT_RESPONSE=$(curl -v --http1.1 -X POST <cluster-helm-url>/api/namespaces/foo/releases/$CLUSTERNAME?chart=mymus/$CLUSTERNAME)
 DEPLYMENT_RESPONSE_CODE=$(echo $DEPLYMENT_RESPONSE | jq -r &apos;.code&apos;) 
 echo $DEPLYMENT_RESPONSE_CODE
 # Check if errors happened during deployment

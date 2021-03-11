@@ -36,11 +36,14 @@ get_crumb () {
 
 replace_placeholders () {
     sed -i "s=<cae-deployment-temp-repo>=$TEMP_DEPLOYMENT_REPO=g" jobs/Build-Job.xml
-    sed -i "s=<jenkins-job-token>=$JENKINS_JOB_TOKEN=g" jobs/Build-Job.xml    
-    sed -i "s=<jenkins-job-token>=$JENKINS_JOB_TOKEN=g" jobs/Docker-Job.xml    
+    sed -i "s=<jenkins-job-token>=$JENKINS_JOB_TOKEN=g" jobs/Build-Job.xml   
+
+    sed -i "s=<cae-deployment-docker-image>=$CAE_DEPLOYMENT_DOCKER_IMAGE=g" jobs/Build-Job.xml   
+    sed -i "s=<docker-hub-login>=$DOCKER_HUB_LOGIN=g" jobs/Build-Job.xml    
+    sed -i "s=<docker-hub-password>=$DOCKER_HUB_PASSWORD=g" jobs/Build-Job.xml    
+
     sed -i "s=<jenkins-job-token>=$JENKINS_JOB_TOKEN=g" jobs/Docker-Job.xml    
     sed -i "s=<cae-deployment-docker-image>=$CAE_DEPLOYMENT_DOCKER_IMAGE=g" jobs/Docker-Job.xml   
-
     sed -i "s=<docker-hub-login>=$DOCKER_HUB_LOGIN=g" jobs/Docker-Job.xml    
     sed -i "s=<docker-hub-password>=$DOCKER_HUB_PASSWORD=g" jobs/Docker-Job.xml    
 

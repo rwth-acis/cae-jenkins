@@ -26,7 +26,7 @@
     <hudson.tasks.Shell>
       <command>NEWONE=$(echo $BODY | jq &apos;.statusUpdate = &quot;NOT DEPLOYED&quot;&apos;)
 echo $NEWONE
-curl --header &quot;Content-Type: application/json&quot; \
+curl -v --http1.1 --header &quot;Content-Type: application/json&quot; \
   --request POST \
   --data &quot;$NEWONE&quot; \
   http://host.docker.internal:8081/CAE/updateDeployStatus</command>
