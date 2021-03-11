@@ -26,6 +26,7 @@ check_if_exists "$LAS2PEER_REGISTRY_URL" LAS2PEER_REGISTRY_URL
 check_if_exists "$CLUSTER_HELM_URL" CLUSTER_HELM_URL
 check_if_exists "$CLUSTER_REPO_URL" CLUSTER_REPO_URL
 check_if_exists "$CAE_HELM_CHART_TEMPLATE" CAE_HELM_CHART_TEMPLATE
+check_if_exists "$NAMESPACE" NAMESPACE
 
 if [ "$ENV_VARIABLE_NOT_SET" = true ] ; then
     echo "Missing environment variables, exiting..."

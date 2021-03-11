@@ -54,8 +54,10 @@ replace_placeholders () {
     sed -i "s=<cae-helm-cahrt-template>=$CAE_HELM_CHART_TEMPLATE=g" jobs/DeployToCluster.xml    
     sed -i "s=<cluster-helm-url>=$CLUSTER_HELM_URL=g" jobs/DeployToCluster.xml    
     sed -i "s=<cluster-repo-url>=$CLUSTER_REPO_URL=g" jobs/DeployToCluster.xml    
+    sed -i "s=<namespace>=$NAMESPACE=g" jobs/DeployToCluster.xml    
 
     sed -i "s=<cluster-helm-url>=$CLUSTER_HELM_URL=g" jobs/UndeployFromCluster.xml    
+    sed -i "s=<namespace>=$NAMESPACE=g" jobs/UndeployFromCluster.xml    
 
    
   

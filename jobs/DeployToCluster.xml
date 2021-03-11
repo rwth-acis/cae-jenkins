@@ -53,7 +53,7 @@ curl -v --http1.1 --data-binary &quot;@$CLUSTERNAME-0.1.0.tgz&quot; <cluster-rep
 curl -v --http1.1 -X PUT <cluster-helm-url>/api/repositories
 
 # Send request to helm-wrapper to deploy application
-DEPLYMENT_RESPONSE=$(curl -v --http1.1 -X POST <cluster-helm-url>/api/namespaces/foo/releases/$CLUSTERNAME?chart=mymus/$CLUSTERNAME)
+DEPLYMENT_RESPONSE=$(curl -v --http1.1 -X POST <cluster-helm-url>/api/namespaces/<namespace>/releases/$CLUSTERNAME?chart=mymus/$CLUSTERNAME)
 DEPLYMENT_RESPONSE_CODE=$(echo $DEPLYMENT_RESPONSE | jq -r &apos;.code&apos;) 
 echo $DEPLYMENT_RESPONSE_CODE
 # Check if errors happened during deployment
