@@ -25,7 +25,8 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>curl -v --http1.1 -X POST  <las2peer-registry-url>/las2peer/services/announceDeployment -d &quot;$BODY&quot;
+      <command>#!/bin/bash
+curl -v --http1.1 -X POST  <las2peer-registry-url>/las2peer/services/announceDeployment -d &quot;$BODY&quot;
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>

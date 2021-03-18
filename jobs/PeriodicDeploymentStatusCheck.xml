@@ -1,0 +1,81 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>H/15 * * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+# Install for json data operations
+sudo apt-get --assume-yes install jq
+
+DEPLOYED_SERVICES=$(curl -v --http1.1 -X GET https://mentoring.tech4comp.dbis.rwth-aachen.de/las2peer/services/deployments)
+
+for service_name in $(jq &apos;keys | .[]&apos; &lt;&lt;&lt; &quot;$DEPLOYED_SERVICES&quot;); do
+  DEPLOYED_SERVICE_RELEASES=$(echo &quot;$DEPLOYED_SERVICES&quot; | jq -r .&quot;$service_name&quot;);
+  for deployed_service in $(echo &quot;${DEPLOYED_SERVICE_RELEASES}&quot; | jq -r &apos;.[] | @base64&apos;); do
+    _jq() {
+     echo &quot;${deployed_service}&quot; | base64 --decode | jq -r &quot;${1}&quot;
+    }
+  TYPE=&quot;$(_jq &apos;.type&apos;)&quot;
+  LINK=&quot;$(_jq &apos;.link&apos;)&quot;
+  if [ &quot;$TYPE&quot; == &quot;cae-application&quot; ]; then
+    echo &quot;Is CAE application&quot;
+    url=$LINK
+    attempts=5
+    timeout=5
+    online=false
+    
+    echo &quot;Checking status of $url.&quot;
+    
+    for (( i=1; i&lt;= attempts; i++ ))
+    do
+      code=$(curl -sL --connect-timeout 20 --max-time 30 -w &quot;%{http_code}\\n&quot; &quot;$url&quot; -o /dev/null)
+    
+      echo &quot;Found code $code for $url.&quot;
+    
+      if [ &quot;$code&quot; = &quot;200&quot; ]; then
+        echo &quot;Website $url is online.&quot;
+        online=true
+        break
+      else
+        echo &quot;Website $url seems to be offline. Waiting $timeout seconds.&quot;
+        sleep $timeout
+      fi
+    done
+    
+    if $online; then
+      echo &quot;Website is online.&quot;
+      echo &quot;$deployed_service&quot; | base64 --decode
+    else
+      echo &quot;Webiste seems to be down.&quot;
+      DEPLYED_SERVICE_DATA=$(echo &quot;$deployed_service&quot; | base64 --decode)
+      echo &quot;$DATA&quot;
+      curl --data-urlencode &quot;BODY=$DEPLYED_SERVICE_DATA&quot; --data-urlencode &quot;token=1475f18c-561d-4c6b-8ffa-4d3ed65d96ea&quot; -G https://mentoring.tech4comp.dbis.rwth-aachen.de/jenkins/job/AnnounceCAEUndeployment/buildWithParameters/
+      curl --data-urlencode &quot;BODY=$DEPLYED_SERVICE_DATA&quot; --data-urlencode &quot;token=1475f18c-561d-4c6b-8ffa-4d3ed65d96ea&quot; -G https://mentoring.tech4comp.dbis.rwth-aachen.de/jenkins/job/UndeployFromCluster/buildWithParameters/
+    fi
+  else
+    echo &quot;Not CAE application&quot;
+  fi
+  done
+done
+</command>
+      <configuredLocalRules/>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

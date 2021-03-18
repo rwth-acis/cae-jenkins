@@ -4,6 +4,8 @@ import hudson.tools.InstallSourceProperty
 import io.jenkins.plugins.adoptopenjdk.AdoptOpenJDKInstaller
 import jenkins.model.Jenkins
 
+Jenkins.instance.setNumExecutors(10)
+
 final versions = [
         'jdk14': 'jdk-14.0.2+12'
 ]

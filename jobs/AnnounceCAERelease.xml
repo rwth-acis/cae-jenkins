@@ -12,6 +12,12 @@
           <defaultValue></defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>HASH</name>
+          <description></description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -28,10 +34,22 @@
 # Install for json data operations
 sudo apt-get --assume-yes install jq
 
-AUTHHEADER=$(echo $BODY | jq -r &apos;.Authorization&apos;) 
-echo $AUTHHEADER
+AUTHHEADER=$(echo &quot;$BODY&quot; | jq -r &apos;.Authorization&apos;) 
+echo &quot;$AUTHHEADER&quot;
+UPDATED_BODY=$(echo &quot;$BODY&quot; | jq --arg HASH &quot;$HASH&quot; &apos;. + {sha256: $HASH}&apos;)
+echo &quot;$UPDATED_BODY&quot;
 
-curl -v --http1.1 -H &quot;Authorization: Basic $AUTHHEADER&quot; -X POST <las2peer-registry-url>/las2peer/services/registerClusterService -d $BODY</command>
+RELEASE_RESPONSE_CODE=$(curl -v --http1.1 -H &quot;Authorization: Basic $AUTHHEADER&quot; -X POST <las2peer-registry-url>/las2peer/services/registerClusterService -d &quot;$UPDATED_BODY&quot; | jq -r &apos;.code&apos;)
+echo &quot;$RELEASE_RESPONSE_CODE&quot;
+if [ &quot;$RELEASE_RESPONSE_CODE&quot; == 200 ]
+ then
+  echo &quot;Release successfully executed&quot;
+else
+  echo &quot;Error releasing&quot;
+  exit 1
+fi
+
+</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
   </builders>

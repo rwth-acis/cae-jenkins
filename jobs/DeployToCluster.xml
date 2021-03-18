@@ -25,45 +25,72 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command># Install for json data operations
+      <command>#!/bin/bash
+# Install for json data operations
 sudo apt-get --assume-yes install jq
+sudo apt-get -y install skopeo
 
-RELEASENAME=$(echo $BODY | jq -r &apos;.name&apos;) 
-CLUSTERNAME=$(echo $BODY | jq -r &apos;.clusterName&apos;) 
-
-
-rm -rf *
 # Install helm
-curl -v --http1.1 https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
 sudo apt-get install apt-transport-https --yes
 echo &quot;deb https://baltocdn.com/helm/stable/debian/ all main&quot; | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 sudo apt-get update
 sudo apt-get install helm
+
+RELEASENAME=$(echo &quot;$BODY&quot; | jq -r &apos;.name&apos;) 
+CLUSTERNAME=$(echo &quot;$BODY&quot; | jq -r &apos;.clusterName&apos;) 
+IMAGE_VERSION=$(echo &quot;$BODY&quot; | jq -r &apos;.version&apos;)
+BOOTSTRAP=$(echo &quot;$BODY&quot; | jq -r &apos;.bootstrap&apos;)
+
+if [[ $BOOTSTRAP =~ ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]):[0-9]+$ ]]; then
+   LAS2PEER_BOOTSTRAP=${BOOTSTRAP}
+   echo &quot;Bootstrap is ip and port combo&quot;
+elif [ -z &quot;$BOOTSTRAP&quot; ]
+then
+   LAS2PEER_BOOTSTRAP=${BOOTSTRAP}
+   echo &quot;No Bootsrap given&quot;
+else
+   LAS2PEER_BOOTSTRAP=&quot;${BOOTSTRAP}-service.ba-erdzan&quot;
+   echo &quot;Cae bootstrap given&quot;
+   echo &quot;$LAS2PEER_BOOTSTRAP&quot;
+fi
+
+
+rm -rf ./*
+
 # Get template helm chart
-git clone <cae-helm-cahrt-template>
+git clone https://git.rwth-aachen.de/jungerjunge2/helm-temp.git
+
 # setup helm chart with user information
-mv ./helm-temp ./$CLUSTERNAME
-sed -i -e &quot;s={NAME}=$CLUSTERNAME=g&quot; ./$CLUSTERNAME/values.yaml
-sed -i -e &quot;s={IMAGENAME}=$RELEASENAME=g&quot; ./$CLUSTERNAME/values.yaml
-sed -i -e &quot;s={NAME}=$CLUSTERNAME=g&quot; ./$CLUSTERNAME/Chart.yaml
-helm package ./$CLUSTERNAME
+mv ./helm-temp ./&quot;$CLUSTERNAME&quot;
+sed -i -e &quot;s={NAME}=$CLUSTERNAME=g&quot; ./&quot;$CLUSTERNAME&quot;/values.yaml
+sed -i -e &quot;s={IMAGENAME}=$RELEASENAME=g&quot; ./&quot;$CLUSTERNAME&quot;/values.yaml
+sed -i -e &quot;s={IMAGE_VERSION}=$IMAGE_VERSION=g&quot; ./&quot;$CLUSTERNAME&quot;/values.yaml
+sed -i -e &quot;s={LAS2PEER_BOOTSTRAP}=$LAS2PEER_BOOTSTRAP=g&quot; ./&quot;$CLUSTERNAME&quot;/values.yaml
+sed -i -e &quot;s={NAME}=$CLUSTERNAME=g&quot; ./&quot;$CLUSTERNAME&quot;/Chart.yaml
+sed -i -e &quot;s={IMAGE_VERSION}=$IMAGE_VERSION=g&quot; ./&quot;$CLUSTERNAME&quot;/Chart.yaml
+
+helm package ./&quot;$CLUSTERNAME&quot;
+
 # Push helm chart to repo
-curl -v --http1.1 --data-binary &quot;@$CLUSTERNAME-0.1.0.tgz&quot; <cluster-repo-url>/api/charts
+curl -v --http1.1 --data-binary &quot;@$CLUSTERNAME-0.1.0.tgz&quot; https://mentoring.tech4comp.dbis.rwth-aachen.de/repo/api/charts
+
 # Update helm repo in helm-wrapper
-curl -v --http1.1 -X PUT <cluster-helm-url>/api/repositories
+curl -v --http1.1 -X PUT https://mentoring.tech4comp.dbis.rwth-aachen.de/helm/api/repositories
 
 # Send request to helm-wrapper to deploy application
-DEPLYMENT_RESPONSE=$(curl -v --http1.1 -X POST <cluster-helm-url>/api/namespaces/<namespace>/releases/$CLUSTERNAME?chart=mymus/$CLUSTERNAME)
-DEPLYMENT_RESPONSE_CODE=$(echo $DEPLYMENT_RESPONSE | jq -r &apos;.code&apos;) 
-echo $DEPLYMENT_RESPONSE_CODE
+DEPLYMENT_RESPONSE=$(curl -v --http1.1 -X POST https://mentoring.tech4comp.dbis.rwth-aachen.de/helm/api/namespaces/ba-erdzan/releases/&quot;$CLUSTERNAME&quot;?chart=mymus/&quot;$CLUSTERNAME&quot;)
+DEPLYMENT_RESPONSE_CODE=$(echo &quot;$DEPLYMENT_RESPONSE&quot; | jq -r &apos;.code&apos;) 
+echo &quot;$DEPLYMENT_RESPONSE_CODE&quot;
+
 # Check if errors happened during deployment
-#if [ $DEPLYMENT_RESPONSE_CODE == 0 ]
-# then
-#  echo $DEPLYMENT_RESPONSE_CODE
-#else
-#	echo $DEPLYMENT_RESPONSE_CODE
-#    exit 42
-#fi
+if [ $DEPLYMENT_RESPONSE_CODE == 0 ]
+then
+  echo &quot;$DEPLYMENT_RESPONSE_CODE&quot;
+else
+  echo &quot;$DEPLYMENT_RESPONSE_CODE&quot;
+  exit 1
+fi
 </command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>

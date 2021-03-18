@@ -25,16 +25,18 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command># Install for json data operations
+      <command>#!/bin/bash
+
+# Install for json data operations
 sudo apt-get --assume-yes install jq
 # Get the passed body information of post request from frontend for application metainfo
 
-CLUSTER_NAME=$(echo $BODY | jq -r &apos;.clusterName&apos;) 
-echo $CLUSTER_NAME
-UNDEPLOYMENT_RESPONSE=$(curl -v --http1.1 -X DELETE <cluster-helm-url>/api/namespaces/<namespace>/releases/$CLUSTER_NAME)
-UNDEPLOYMENT_RESPONSE_CODE=$(echo $UNDEPLOYMENT_RESPONSE | jq -r &apos;.code&apos;) 
-echo $UNDEPLOYMENT_RESPONSE
-echo $UNDEPLOYMENT_RESPONSE_CODE</command>
+CLUSTER_NAME=$(echo &quot;$BODY&quot; | jq -r &apos;.clusterName&apos;) 
+echo &quot;$CLUSTER_NAME&quot;
+UNDEPLOYMENT_RESPONSE=$(curl -v --http1.1 -X DELETE https://mentoring.tech4comp.dbis.rwth-aachen.de/helm/api/namespaces/ba-erdzan/releases/&quot;$CLUSTER_NAME&quot;)
+UNDEPLOYMENT_RESPONSE_CODE=$(echo &quot;$UNDEPLOYMENT_RESPONSE&quot; | jq -r &apos;.code&apos;) 
+echo &quot;$UNDEPLOYMENT_RESPONSE&quot;
+echo &quot;$UNDEPLOYMENT_RESPONSE_CODE&quot;</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jenkinsci.plugins.conditionalbuildstep.singlestep.SingleConditionalBuilder plugin="conditional-buildstep@1.4.1">
